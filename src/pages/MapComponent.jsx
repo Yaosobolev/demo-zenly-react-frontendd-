@@ -15,7 +15,8 @@ const MapComponent = () => {
   });
 
   const [data, setData] = useState(null);
-  const [user, setUser] = useState(null);
+  const [userMarkerId, setUserMarkerId] = useState(null);
+  const [userMarkerCoor, setUserMarkerCoor] = useState(null);
   const [error, setError] = useState(null);
   const [userLatitude, setUserLatitude] = useState(0);
   const [userLongitude, setUserLongitude] = useState(0);
@@ -24,10 +25,10 @@ const MapComponent = () => {
   const userLocation = [userLatitude, userLongitude];
   const { mapId } = useParams();
 
-  const apiUrl = "https://map-back.onrender.com/api/v1/markers";
-  const apiUrlAth = "https://map-back.onrender.com/api/v1/auth";
-  // const apiUrl = "http://localhost:3000/api/v1/markers";
-  // const apiUrlAth = "http://localhost:3000/api/v1/auth";
+  // const apiUrl = "https://map-back.onrender.com/api/v1/markers";
+  // const apiUrlAth = "https://map-back.onrender.com/api/v1/auth";
+  const apiUrl = "http://localhost:3000/api/v1/markers";
+  const apiUrlAth = "http://localhost:3000/api/v1/auth";
 
   // получение собственного гео
   const getLocation = () => {
@@ -53,11 +54,6 @@ const MapComponent = () => {
       console.error("Геолокация не поддерживается в вашем браузере");
     }
   };
-
-  // put http://localhost:3000/api/v1/markers/set-marker
-  // get http://localhost:3000/api/v1/markers/search-marker
-
-  // const getMarkerById = () => {};
 
   // отправка гео
   const updateData = async () => {
@@ -203,17 +199,38 @@ const MapComponent = () => {
       .catch((error) => {
         setError(error.message);
       });
+    console.log(data);
   };
-  // получение гео пользователей
-  const getUsers = () => {
+  // получение гео id пользователей
+  const getUsersrMarkerId = () => {
     axios
       .get(`${apiUrl}/users`)
       .then((response) => {
-        setUser(response.data);
+        setUserMarkerId(response.data);
       })
       .catch((error) => {
         setError(error.message);
       });
+
+    console.log(userMarkerId);
+  };
+
+  // получение гео coor пользователей
+  const getUsersrMarkerCoor = () => {
+    axios
+      .get(`${apiUrl}/search-marker-coor`, {
+        params: {
+          id: userMarkerId.marker_id,
+        },
+      })
+      .then((response) => {
+        setUserMarkerCoor(response.data);
+      })
+      .catch((error) => {
+        setError(error.message);
+      });
+
+    console.log(userMarkerCoor);
   };
 
   // получение данных о пользователи
@@ -243,7 +260,8 @@ const MapComponent = () => {
   useEffect(() => {
     updateData();
     getData();
-    getUsers();
+    getUsersrMarkerId();
+    // getUsersrMarkerCoor();
     setStatus(true);
   }, [userLongitude, userLatitude]);
 
@@ -267,8 +285,8 @@ const MapComponent = () => {
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             />
 
-            {user && user.length > 0 ? (
-              user.map((point, index) => (
+            {userMarkerId && userMarkerId.length > 0 ? (
+              userMarkerId.map((point, index) => (
                 <Marker
                   key={index}
                   position={[point.latitude, point.longitude]}
