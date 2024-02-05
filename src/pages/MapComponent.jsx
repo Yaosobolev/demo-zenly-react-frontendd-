@@ -21,7 +21,7 @@ const MapComponent = () => {
   const userLocation = [userLatitude, userLongitude];
 
   // const apiUrl = "http://localhost:3000/api/v1/markers";
-  const apiUrl = "https://map-back.onrender.com//api/v1/markers";
+  const apiUrl = "https://map-back.onrender.com/api/v1/markers";
 
   // получение собственного гео
   const getLocation = () => {
