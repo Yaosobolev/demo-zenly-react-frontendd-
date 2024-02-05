@@ -22,7 +22,7 @@ const Registration = () => {
   };
 
   // const apiUrl = "http://localhost:3000/api/v1/auth/register";
-  const apiUrl = "https://map-back.onrender.com/api/v1/auth/register";
+  const apiUrl = "https://map-back.onrender.com//api/v1/auth/register";
 
   const handleSignUp = async (event) => {
     event.preventDefault();

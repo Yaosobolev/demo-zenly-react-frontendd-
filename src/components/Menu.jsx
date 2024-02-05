@@ -27,13 +27,14 @@ const Menu = () => {
       >
         <div className="mb-4">
           <label htmlFor="name" className="block text-gray-800 mb-1">
-            Имя: {mapId}
+            Имя:
           </label>
           <input
             type="text"
             id="name"
             disabled
             className="border border-gray-300 rounded px-2 py-1 w-full"
+            value={mapId}
           />
         </div>
         <div className="mb-4">
@@ -41,10 +42,7 @@ const Menu = () => {
           <button>Друзья</button>
         </div>
 
-        <button
-          //   onClick={handleLogout}
-          className="burger-menu-item block py-2 text-gray-800"
-        >
+        <button className="burger-menu-item block py-2 text-gray-800">
           Выйти из аккаунта
         </button>
       </div>

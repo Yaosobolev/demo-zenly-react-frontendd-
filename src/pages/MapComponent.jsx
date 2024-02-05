@@ -4,6 +4,7 @@ import L, { map } from "leaflet";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import Menu from "../components/Menu";
+import { useParams } from "react-router-dom";
 
 const MapComponent = () => {
   const markerIcon = L.icon({
@@ -18,10 +19,14 @@ const MapComponent = () => {
   const [userLatitude, setUserLatitude] = useState(0);
   const [userLongitude, setUserLongitude] = useState(0);
   const [status, setStatus] = useState(false);
+  const [dataUser, setDataUser] = useState([]);
   const userLocation = [userLatitude, userLongitude];
+  const { mapId } = useParams();
 
-  // const apiUrl = "http://localhost:3000/api/v1/markers";
   const apiUrl = "https://map-back.onrender.com/api/v1/markers";
+  const apiUrlAth = "https://map-back.onrender.com/api/v1/auth";
+  // const apiUrl = "http://localhost:3000/api/v1/markers";
+  // const apiUrlAth = "http://localhost:3000/api/v1/auth";
 
   // получение собственного гео
   const getLocation = () => {
@@ -48,29 +53,94 @@ const MapComponent = () => {
     }
   };
 
+  // put http://localhost:3000/api/v1/markers/set-marker
+  // get http://localhost:3000/api/v1/markers/search-marker
+
+  // const getMarkerById = () => {};
+
   // отправка гео
   const updateData = async () => {
     if (userLatitude !== 0 || userLongitude !== 0) {
       try {
-        // const dbResponse = await axios.get(apiUrl); // Замените dbUrl на URL вашего эндпоинта для получения координат из базы данных
-        // console.log(dbResponse.data[0]);
-        // const dbLatitude = dbResponse.data[0].latitude;
-        // console.log(dbLatitude);
-        // const dbLongitude = dbResponse.data.longitude;
-        // // console.log("dbResponse+ " + dbLatitude);
+        console.log(dataUser.marker_id === null);
+        console.log(dataUser);
+        if (dataUser.marker_id === null) {
+          // установка координаты в бд координат
+          const response = await axios.post(apiUrl, {
+            latitude: userLatitude,
+            longitude: userLongitude,
+          });
 
-        // if (userLatitude === dbLatitude && userLongitude === dbLongitude) {
-        //   console.log(
-        //     "Координаты пользователя совпадают с координатами из базы данных"
-        //   );
-        //   return; // Прерываем выполнение функции
-        // }
-        const dbResponse = await axios.get(apiUrl);
+          //поиск id координаты
+          const dbResponse = await axios.get(`${apiUrl}/search-marker-id`, {
+            params: {
+              latitude: userLatitude,
+              longitude: userLongitude,
+            },
+          });
+          // установка координаты к пользователю
+          const addMarker = await axios.put(`${apiUrl}/set-marker`, {
+            id: dbResponse.data.result,
+            name: mapId,
+          });
+        }
 
-        dbResponse.data.map((item) => {
-          console.log(item.latitude); // Выводим каждый элемент в консоль
-          // Здесь вы можете выполнить какие-то действия с каждым элементом, например, сравнить с координатами пользователя
-        });
+        const currentDbResponses = await axios.get(
+          `${apiUrl}/search-marker-coor`,
+          {
+            params: {
+              id: dataUser.marker_id,
+            },
+          }
+        );
+        console.log(dataUser.marker_id);
+
+        // const dbCoorUser = await axios.get(`${apiUrl}/search-marker-coor`, {
+        //   params: {
+        //     latitude: userLatitude,
+        //     longitude: userLongitude,
+        //   },
+        // });
+        // Сравнить id метки у пользователя с действующей
+        if (
+          Number(currentDbResponses.data.result.latitude === userLatitude) &&
+          Number(currentDbResponses.data.result.longitude === userLongitude)
+        ) {
+          return;
+        } else {
+          // установка координаты в бд координат
+
+          const response = await axios.post(apiUrl, {
+            latitude: userLatitude,
+            longitude: userLongitude,
+          });
+
+          //поиск id координаты
+          const dbResponse = await axios.get(`${apiUrl}/search-marker-id`, {
+            params: {
+              latitude: userLatitude,
+              longitude: userLongitude,
+            },
+          });
+
+          // установка координаты к пользователю
+          const addMarker = await axios.put(`${apiUrl}/set-marker`, {
+            id: dbResponse.data.result,
+            name: mapId,
+          });
+        }
+
+        // const dbResponse = await axios.get(`${apiUrl}/search-marker`, {
+        //   params: {
+        //     latitude: userLatitude,
+        //     longitude: userLongitude,
+        //   },
+        // });
+
+        // const addMarker = await axios.put(`${apiUrl}/set-marker`, {
+        //   id: dbResponse.data.result,
+        //   name: mapId,
+        // });
 
         // if (dbResponse && dbResponse.data && dbResponse.data.length > 0) {
         //   // Проверяем, есть ли хотя бы один объект с координатами из базы данных, совпадающий с координатами пользователя
@@ -89,33 +159,33 @@ const MapComponent = () => {
         //   }
         // }
 
-        for (let i = 0; i < dbResponse.data.length; i++) {
-          const item = dbResponse.data[i];
-          console.log(Number(item.latitude) === userLatitude); // Выводим каждый элемент в консоль для отладки
+        // for (let i = 0; i < dbResponse.data.length; i++) {
+        //   const item = dbResponse.data[i];
+        //   console.log(Number(item.latitude) === userLatitude); // Выводим каждый элемент в консоль для отладки
 
-          // Сравниваем координаты из базы данных с координатами пользователя
-          if (
-            Number(item.latitude) === userLatitude &&
-            Number(item.longitude) === userLongitude
-          ) {
-            console.log(
-              "Координаты пользователя совпадают с координатами из базы данных"
-            );
-            return; // Прерываем выполнение функции
-          }
-          console.log();
-        }
+        //   // Сравниваем координаты из базы данных с координатами пользователя
+        //   if (
+        //     Number(item.latitude) === userLatitude &&
+        //     Number(item.longitude) === userLongitude
+        //   ) {
+        //     console.log(
+        //       "Координаты пользователя совпадают с координатами из базы данных"
+        //     );
+        //     return; // Прерываем выполнение функции
+        //   }
+        //   console.log();
+        // }
 
-        const response = await axios.post(apiUrl, {
-          latitude: userLatitude,
-          longitude: userLongitude,
-        });
+        // const response = await axios.post(apiUrl, {
+        //   latitude: userLatitude,
+        //   longitude: userLongitude,
+        // });
 
-        if (response.data === "Marker create") {
-          console.log("Данные успешно обновлены");
-        } else {
-          console.error("Ошибка при обновлении данных:", response.data.message);
-        }
+        // if (response.data === "Marker create") {
+        //   console.log("Данные успешно обновлены");
+        // } else {
+        //   console.error("Ошибка при обновлении данных:", response.data.message);
+        // }
       } catch (error) {
         console.error("Ошибка при отправке запроса:", error.message);
       }
@@ -134,11 +204,24 @@ const MapComponent = () => {
       });
   };
 
+  // получение данных о пользователи
+
+  const getDataUser = async () => {
+    const result = await axios.get(`${apiUrlAth}/search-user`, {
+      params: {
+        name: mapId,
+      },
+    });
+
+    setDataUser(result.data.user);
+  };
+
   // при зашрузки получение гео
   useEffect(() => {
     const intervalId = setInterval(() => {
       getLocation();
     }, 5000); // 2000 миллисекунд = 2 секунды
+    getDataUser();
 
     // Очищаем интервал при размонтировании компонента
     return () => clearInterval(intervalId);
@@ -178,7 +261,7 @@ const MapComponent = () => {
                   position={[point.latitude, point.longitude]}
                   icon={markerIcon}
                 >
-                  <Popup>это ты</Popup>
+                  <Popup>{mapId}</Popup>
                 </Marker>
               ))
             ) : (
