@@ -19,8 +19,8 @@ const Login = () => {
     console.log(data);
   };
 
-  const apiUrl = "http://localhost:3000/api/v1/auth/login";
-  // const apiUrl = "https://map-back.onrender.com/api/v1/auth/login";
+  // const apiUrl = "http://localhost:3000/api/v1/auth/login";
+  const apiUrl = "https://map-back.onrender.com/api/v1/auth/login";
 
   const handleSignUp = async (event) => {
     event.preventDefault();

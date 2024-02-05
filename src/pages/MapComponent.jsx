@@ -25,10 +25,10 @@ const MapComponent = () => {
   const userLocation = [userLatitude, userLongitude];
   const { mapId } = useParams();
 
-  // const apiUrl = "https://map-back.onrender.com/api/v1/markers";
-  // const apiUrlAth = "https://map-back.onrender.com/api/v1/auth";
-  const apiUrl = "http://localhost:3000/api/v1/markers";
-  const apiUrlAth = "http://localhost:3000/api/v1/auth";
+  const apiUrl = "https://map-back.onrender.com/api/v1/markers";
+  const apiUrlAth = "https://map-back.onrender.com/api/v1/auth";
+  // const apiUrl = "http://localhost:3000/api/v1/markers";
+  // const apiUrlAth = "http://localhost:3000/api/v1/auth";
 
   // получение собственного гео
   const getLocation = () => {
