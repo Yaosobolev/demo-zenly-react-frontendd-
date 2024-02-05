@@ -195,7 +195,7 @@ const MapComponent = () => {
   // получение гео
   const getData = () => {
     axios
-      .get(apiUrl)
+      .get(`${apiUrl}/users`)
       .then((response) => {
         setData(response.data);
       })
