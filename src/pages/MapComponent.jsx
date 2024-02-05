@@ -15,6 +15,7 @@ const MapComponent = () => {
   });
 
   const [data, setData] = useState(null);
+  const [user, setUser] = useState(null);
   const [error, setError] = useState(null);
   const [userLatitude, setUserLatitude] = useState(0);
   const [userLongitude, setUserLongitude] = useState(0);
@@ -195,9 +196,20 @@ const MapComponent = () => {
   // получение гео
   const getData = () => {
     axios
-      .get(`${apiUrl}/users`)
+      .get(`${apiUrl}`)
       .then((response) => {
         setData(response.data);
+      })
+      .catch((error) => {
+        setError(error.message);
+      });
+  };
+  // получение гео пользователей
+  const getUsers = () => {
+    axios
+      .get(`${apiUrl}/users`)
+      .then((response) => {
+        setUser(response.data);
       })
       .catch((error) => {
         setError(error.message);
@@ -231,6 +243,7 @@ const MapComponent = () => {
   useEffect(() => {
     updateData();
     getData();
+    getUsers();
     setStatus(true);
   }, [userLongitude, userLatitude]);
 
@@ -254,8 +267,8 @@ const MapComponent = () => {
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             />
 
-            {data && data.length > 0 ? (
-              data.map((point, index) => (
+            {user && user.length > 0 ? (
+              user.map((point, index) => (
                 <Marker
                   key={index}
                   position={[point.latitude, point.longitude]}
